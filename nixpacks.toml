@@ -1,11 +1,14 @@
 [providers]
-node = "18"
+providers = ["node"]
+
+[phases.setup]
+nodejs = "18"
 
 [variables]
 NODE_ENV = "production"
 
-[build]
-cmds = ["cd Vibepay && npm install"]
+[install]
+cmds = ["npm ci || npm install"]
 
 [start]
-cmd = "cd Vibepay && npm start"
+cmd = "npm start"
