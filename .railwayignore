@@ -1,0 +1,23 @@
+# Ignore Python files and directories
+requirements*.txt
+*.py
+__pycache__/
+*.pyc
+.env
+venv/
+env/
+.venv/
+
+# Ignore other non-Node.js files
+terraform.exe
+TriST/
+alembic/
+*.md
+!README.md
+
+# Keep Node.js files
+!package.json
+!package-lock.json
+!api/
+!dashboard/
+!railway.json

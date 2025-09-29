@@ -1,0 +1,1 @@
+# Node\nnode_modules/\n.npm/\n.npmrc\n# Logs\nlogs/\n*.log\n# Builds\ndist/\nbuild/\n.next/\n.out/\ncoverage/\n# Env\n.env\n.env.*\n# OS\n.DS_Store\nThumbs.db\n# Editor\n.vscode/\n.idea/\n

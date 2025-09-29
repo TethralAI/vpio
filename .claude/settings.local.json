@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(git remote remove:*)",
+      "Bash(echo $CODESPACES)",
+      "Bash(env)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

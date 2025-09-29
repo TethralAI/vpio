@@ -1,0 +1,11 @@
+[providers]
+node = "18"
+
+[variables]
+NODE_ENV = "production"
+
+[build]
+cmds = ["cd Vibepay && npm install"]
+
+[start]
+cmd = "cd Vibepay && npm start"
