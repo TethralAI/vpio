@@ -1,4 +1,4 @@
-# VibePay
+# VPIO
 
 A simple and elegant payment processing API built with Express.js and Stripe integration.
 
@@ -23,7 +23,7 @@ A simple and elegant payment processing API built with Express.js and Stripe int
 1. Clone the repository:
 ```bash
 git clone <your-repo-url>
-cd vibepay
+cd vpio
 ```
 
 2. Install dependencies:
@@ -36,7 +36,7 @@ npm install
 # Required environment variables
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-VALID_API_KEYS=vibepay-demo-key,your-custom-key
+VALID_API_KEYS=vpio-demo-key,your-custom-key
 PORT=3000
 ```
 
@@ -50,7 +50,7 @@ Visit `http://localhost:3000` to access the dashboard.
 ## Project Structure
 
 ```
-vibepay/
+vpio/
 ├── api/
 │   ├── index.js           # Main server entry point
 │   ├── payments.js        # Payment processing logic
@@ -99,10 +99,10 @@ All API endpoints (except webhooks and health) require an API key:
 
 ```bash
 # Using header
-curl -H "x-api-key: vibepay-demo-key" http://localhost:3000/api/payments/...
+curl -H "x-api-key: vpio-demo-key" http://localhost:3000/api/payments/...
 
 # Using query parameter
-curl "http://localhost:3000/api/payments/...?api_key=vibepay-demo-key"
+curl "http://localhost:3000/api/payments/...?api_key=vpio-demo-key"
 ```
 
 ## Deployment
@@ -145,12 +145,12 @@ Use the built-in dashboard at `/` to test payments, or use curl:
 # Create payment intent
 curl -X POST http://localhost:3000/api/payments/create-payment-intent \
   -H "Content-Type: application/json" \
-  -H "x-api-key: vibepay-demo-key" \
+  -H "x-api-key: vpio-demo-key" \
   -d '{"amount": 10.99}'
 
 # Check payment status
 curl http://localhost:3000/api/payments/payment-status/pi_xxxxx \
-  -H "x-api-key: vibepay-demo-key"
+  -H "x-api-key: vpio-demo-key"
 ```
 
 ## License

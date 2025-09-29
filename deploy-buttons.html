@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy VPIO - One-Click Deployment</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'gradient': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            },
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .deploy-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deploy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .deploy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .deploy-button:hover::before {
+            left: 100%;
+        }
+
+        .bg-gradient-rainbow {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-rainbow min-h-screen">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-16">
+                <div class="inline-block animate-float mb-8">
+                    <div class="w-20 h-20 bg-white rounded-2xl shadow-2xl flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-4xl">🚀</span>
+                    </div>
+                </div>
+
+                <h1 class="text-6xl font-bold text-white mb-6 tracking-tight">
+                    Deploy <span class="bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">VPIO</span>
+                </h1>
+
+                <p class="text-xl text-white/90 mb-4 max-w-3xl mx-auto leading-relaxed">
+                    Universal payment processing platform. One-click deployment to your favorite hosting service.
+                </p>
+
+                <div class="flex justify-center space-x-4 text-white/80 text-sm">
+                    <span class="bg-white/20 px-3 py-1 rounded-full">💳 Stripe</span>
+                    <span class="bg-white/20 px-3 py-1 rounded-full">🟦 Square</span>
+                    <span class="bg-white/20 px-3 py-1 rounded-full">💰 PayPal</span>
+                    <span class="bg-white/20 px-3 py-1 rounded-full">🏦 Plaid</span>
+                </div>
+            </div>
+
+            <!-- Deployment Options -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+
+                <!-- VPIO API Deployment -->
+                <div class="glass-effect rounded-3xl p-8 backdrop-blur-xl">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">VPIO API</h2>
+                        <p class="text-white/80 text-sm">Universal payment processing backend</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Railway Deploy -->
+                        <a href="https://railway.app/template/4jJ8Zm?referralCode=vibepay"
+                           class="deploy-button block w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-gray-800 hover:to-gray-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13.5 3L23 12.5L13.5 22H1V3h12.5z"/>
+                                </svg>
+                                <span>Deploy API to Railway</span>
+                            </div>
+                        </a>
+
+                        <!-- Vercel Deploy -->
+                        <a href="https://vercel.com/new/clone?repository-url=https://github.com/TethralAI/vpio&env=STRIPE_SECRET_KEY,STRIPE_WEBHOOK_SECRET&project-name=vibepay-api&repository-name=vibepay-api"
+                           class="deploy-button block w-full bg-gradient-to-r from-black to-gray-900 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-gray-900 hover:to-black">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 22.525H0l12-21.05 12 21.05z"/>
+                                </svg>
+                                <span>Deploy API to Vercel</span>
+                            </div>
+                        </a>
+
+                        <!-- Netlify Deploy -->
+                        <a href="https://app.netlify.com/start/deploy?repository=https://github.com/TethralAI/vpio"
+                           class="deploy-button block w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-teal-600 hover:to-cyan-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.017 0L.353 6.637v10.726L12.017 24l11.664-6.637V6.637L12.017 0z"/>
+                                </svg>
+                                <span>Deploy API to Netlify</span>
+                            </div>
+                        </a>
+
+                        <!-- Heroku Deploy -->
+                        <a href="https://heroku.com/deploy?template=https://github.com/TethralAI/vpio"
+                           class="deploy-button block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-purple-700 hover:to-pink-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.61 0H3.39C2.189 0 1.23.96 1.23 2.16v19.681c0 1.198.959 2.159 2.16 2.159h17.22c1.2 0 2.159-.961 2.159-2.159V2.16C22.77.96 21.811 0 20.61 0z"/>
+                                </svg>
+                                <span>Deploy API to Heroku</span>
+                            </div>
+                        </a>
+
+                        <!-- Render Deploy -->
+                        <a href="https://render.com/deploy?repo=https://github.com/TethralAI/vpio"
+                           class="deploy-button block w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-green-600 hover:to-blue-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12z"/>
+                                </svg>
+                                <span>Deploy API to Render</span>
+                            </div>
+                        </a>
+
+                        <!-- DigitalOcean App Platform -->
+                        <a href="https://cloud.digitalocean.com/apps/new?repo=https://github.com/TethralAI/vpio"
+                           class="deploy-button block w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-blue-600 hover:to-indigo-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zM8.4 14.4H6v-2.4h2.4v2.4zm8.4 2.4h-2.4v2.4H12v-2.4H9.6v-2.4H12V12h2.4v2.4h2.4v2.4z"/>
+                                </svg>
+                                <span>Deploy API to DigitalOcean</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Next.js Template Deployment -->
+                <div class="glass-effect rounded-3xl p-8 backdrop-blur-xl">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Next.js Frontend</h2>
+                        <p class="text-white/80 text-sm">Ready-to-use checkout page template</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Vercel Deploy -->
+                        <a href="https://vercel.com/new/clone?repository-url=https://github.com/TethralAI/nextjs-vpio-template&env=NEXT_PUBLIC_VPIO_API_URL,NEXT_PUBLIC_VPIO_API_KEY&project-name=vpio-checkout&repository-name=vpio-checkout"
+                           class="deploy-button block w-full bg-gradient-to-r from-black to-gray-900 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-gray-900 hover:to-black">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 22.525H0l12-21.05 12 21.05z"/>
+                                </svg>
+                                <span>Deploy Frontend to Vercel</span>
+                            </div>
+                        </a>
+
+                        <!-- Netlify Deploy -->
+                        <a href="https://app.netlify.com/start/deploy?repository=https://github.com/TethralAI/nextjs-vpio-template"
+                           class="deploy-button block w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-teal-600 hover:to-cyan-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.017 0L.353 6.637v10.726L12.017 24l11.664-6.637V6.637L12.017 0z"/>
+                                </svg>
+                                <span>Deploy Frontend to Netlify</span>
+                            </div>
+                        </a>
+
+                        <!-- Railway Deploy -->
+                        <a href="https://railway.app/new/template/nextjs?referralCode=vpio"
+                           class="deploy-button block w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-gray-800 hover:to-gray-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13.5 3L23 12.5L13.5 22H1V3h12.5z"/>
+                                </svg>
+                                <span>Deploy Frontend to Railway</span>
+                            </div>
+                        </a>
+
+                        <!-- Heroku Deploy -->
+                        <a href="https://heroku.com/deploy?template=https://github.com/TethralAI/nextjs-vpio-template"
+                           class="deploy-button block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-purple-700 hover:to-pink-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.61 0H3.39C2.189 0 1.23.96 1.23 2.16v19.681c0 1.198.959 2.159 2.16 2.159h17.22c1.2 0 2.159-.961 2.159-2.159V2.16C22.77.96 21.811 0 20.61 0z"/>
+                                </svg>
+                                <span>Deploy Frontend to Heroku</span>
+                            </div>
+                        </a>
+
+                        <!-- Render Deploy -->
+                        <a href="https://render.com/deploy?repo=https://github.com/TethralAI/nextjs-vpio-template"
+                           class="deploy-button block w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold text-center hover:from-green-600 hover:to-blue-700">
+                            <div class="flex items-center justify-center space-x-3">
+                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12z"/>
+                                </svg>
+                                <span>Deploy Frontend to Render</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Deploy Section -->
+            <div class="glass-effect rounded-3xl p-8 backdrop-blur-xl mb-16">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">⚡ Quick Deploy</h2>
+                    <p class="text-white/80 max-w-2xl mx-auto">
+                        Get VPIO running in under 2 minutes. Choose your preferred hosting platform and we'll handle the rest.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <!-- Railway -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13.5 3L23 12.5L13.5 22H1V3h12.5z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Railway</h3>
+                        <p class="text-white/70 text-sm">Simple deployments with automatic scaling</p>
+                    </div>
+
+                    <!-- Vercel -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-black to-gray-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 22.525H0l12-21.05 12 21.05z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Vercel</h3>
+                        <p class="text-white/70 text-sm">Optimized for Next.js and static sites</p>
+                    </div>
+
+                    <!-- Netlify -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.017 0L.353 6.637v10.726L12.017 24l11.664-6.637V6.637L12.017 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Netlify</h3>
+                        <p class="text-white/70 text-sm">Fast static site hosting with CDN</p>
+                    </div>
+
+                    <!-- Heroku -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.61 0H3.39C2.189 0 1.23.96 1.23 2.16v19.681c0 1.198.959 2.159 2.16 2.159h17.22c1.2 0 2.159-.961 2.159-2.159V2.16C22.77.96 21.811 0 20.61 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Heroku</h3>
+                        <p class="text-white/70 text-sm">Flexible platform-as-a-service</p>
+                    </div>
+
+                    <!-- Render -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Render</h3>
+                        <p class="text-white/70 text-sm">Modern cloud platform with zero-config</p>
+                    </div>
+
+                    <!-- DigitalOcean -->
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zM8.4 14.4H6v-2.4h2.4v2.4zm8.4 2.4h-2.4v2.4H12v-2.4H9.6v-2.4H12V12h2.4v2.4h2.4v2.4z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">DigitalOcean</h3>
+                        <p class="text-white/70 text-sm">Developer-friendly cloud platform</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Environment Variables -->
+            <div class="glass-effect rounded-3xl p-8 backdrop-blur-xl">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">🔐 Environment Variables</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- API Variables -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">VPIO API</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-white/10 rounded-lg p-3">
+                                <code class="text-green-300">STRIPE_SECRET_KEY</code>
+                                <p class="text-white/70 mt-1">Your Stripe secret key (sk_live_...)</p>
+                            </div>
+                            <div class="bg-white/10 rounded-lg p-3">
+                                <code class="text-green-300">STRIPE_WEBHOOK_SECRET</code>
+                                <p class="text-white/70 mt-1">Stripe webhook endpoint secret</p>
+                            </div>
+                            <div class="bg-white/10 rounded-lg p-3">
+                                <code class="text-green-300">NODE_ENV</code>
+                                <p class="text-white/70 mt-1">Set to "production"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frontend Variables -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">Next.js Frontend</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-white/10 rounded-lg p-3">
+                                <code class="text-blue-300">NEXT_PUBLIC_VPIO_API_URL</code>
+                                <p class="text-white/70 mt-1">Your deployed VPIO API URL</p>
+                            </div>
+                            <div class="bg-white/10 rounded-lg p-3">
+                                <code class="text-blue-300">NEXT_PUBLIC_VPIO_API_KEY</code>
+                                <p class="text-white/70 mt-1">VPIO API key (vpio-test-key-1)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-16">
+                <p class="text-white/70 text-sm">
+                    Powered by VPIO Universal Payment Connector
+                </p>
+                <div class="flex justify-center space-x-6 mt-4 text-white/60">
+                    <a href="#" class="hover:text-white transition-colors">Documentation</a>
+                    <a href="#" class="hover:text-white transition-colors">GitHub</a>
+                    <a href="#" class="hover:text-white transition-colors">Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

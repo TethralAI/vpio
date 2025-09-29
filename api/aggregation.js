@@ -44,7 +44,7 @@ const aggregateDailyStats = async () => {
       generatedAt: new Date().toISOString()
     };
 
-    const statsFile = path.join(DATA_DIR, `daily-stats-${today}.json`);
+    const statsFile = path.join(DATA_DIR, 'payments_log.json');
     await fs.writeFile(statsFile, JSON.stringify(stats, null, 2));
 
     console.log(`Daily stats aggregated: ${stats.totalTransactions} transactions, $${stats.totalAmount.toFixed(2)} total`);
@@ -56,8 +56,7 @@ const aggregateDailyStats = async () => {
 
 const getLatestStats = async () => {
   try {
-    const today = new Date().toISOString().split('T')[0];
-    const statsFile = path.join(DATA_DIR, `daily-stats-${today}.json`);
+    const statsFile = path.join(DATA_DIR, 'payments_log.json');
     const data = await fs.readFile(statsFile, 'utf8');
     return JSON.parse(data);
   } catch (error) {

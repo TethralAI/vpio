@@ -1,31 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
 const cron = require('node-cron');
 
-const RETRY_DIR = path.join(__dirname, '../data');
-const RETRY_FILE = path.join(RETRY_DIR, 'failed-webhooks.json');
 const MAX_RETRIES = 3;
-
-const loadFailedWebhooks = async () => {
-  try {
-    const data = await fs.readFile(RETRY_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-};
-
-const saveFailedWebhooks = async (webhooks) => {
-  try {
-    await fs.writeFile(RETRY_FILE, JSON.stringify(webhooks, null, 2));
-  } catch (error) {
-    console.error('Error saving failed webhooks:', error);
-  }
-};
+let failedWebhooks = []; // In-memory storage
 
 const addFailedWebhook = async (eventData, error) => {
-  const failedWebhooks = await loadFailedWebhooks();
-
   const webhook = {
     id: Date.now().toString(),
     eventType: eventData.type,
@@ -39,8 +17,7 @@ const addFailedWebhook = async (eventData, error) => {
   };
 
   failedWebhooks.push(webhook);
-  await saveFailedWebhooks(failedWebhooks);
-  console.log(`Added failed webhook to retry queue: ${webhook.eventType}`);
+  console.log(`Added failed webhook to retry queue: ${webhook.eventType} (${failedWebhooks.length} total)`);
 };
 
 const processWebhookEvent = async (eventData) => {
@@ -62,7 +39,6 @@ const processWebhookEvent = async (eventData) => {
 };
 
 const retryFailedWebhooks = async () => {
-  const failedWebhooks = await loadFailedWebhooks();
   const now = new Date();
   const updated = [];
 
@@ -93,12 +69,11 @@ const retryFailedWebhooks = async () => {
     }
   }
 
-  await saveFailedWebhooks(updated);
+  failedWebhooks = updated;
 };
 
 const startWebhookRetryScheduler = () => {
   cron.schedule('0 * * * *', async () => {
-    const failedWebhooks = await loadFailedWebhooks();
     if (failedWebhooks.length > 0) {
       console.log(`Checking ${failedWebhooks.length} failed webhooks for retry...`);
       await retryFailedWebhooks();
@@ -109,7 +84,6 @@ const startWebhookRetryScheduler = () => {
 };
 
 const getRetryStats = async () => {
-  const failedWebhooks = await loadFailedWebhooks();
   return {
     total: failedWebhooks.length,
     byRetryCount: failedWebhooks.reduce((acc, webhook) => {

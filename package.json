@@ -1,12 +1,24 @@
 {
-  "name": "vibepay",
+  "name": "vpio",
   "version": "1.0.0",
   "description": "Simple payment processing API with Stripe integration",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
     "dev": "nodemon api/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "railway up",
+    "deploy:prod": "NODE_ENV=production railway up",
+    "deploy:staging": "NODE_ENV=staging railway up",
+    "logs": "railway logs --follow",
+    "status": "railway status",
+    "health": "curl -f http://localhost:3000/health",
+    "health:prod": "curl -f https://$RAILWAY_STATIC_URL/health",
+    "setup:railway": "./railway-deploy.sh",
+    "docker:build": "docker build -t vpio .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env vpio",
+    "docker:dev": "docker run -p 3000:3000 --env-file .env -v $(pwd):/app vpio npm run dev",
+    "env:check": "node -e \"console.log('Environment check:'); console.log('PORT:', process.env.PORT || '3000'); console.log('NODE_ENV:', process.env.NODE_ENV || 'development'); console.log('STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? '✅ Set' : '❌ Missing');\""
   },
   "keywords": [
     "payments",
@@ -14,13 +26,14 @@
     "api",
     "fintech"
   ],
-  "author": "VibePay Team",
+  "author": "VPIO Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "stripe": "^13.11.0",
     "cors": "^2.8.5",
-    "node-cron": "^3.0.3"
+    "express": "^4.18.2",
+    "ioredis": "^5.8.0",
+    "node-cron": "^3.0.3",
+    "stripe": "^13.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
@@ -30,10 +43,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/vibepay.git"
+    "url": "https://github.com/your-username/vpio.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/vibepay/issues"
+    "url": "https://github.com/your-username/vpio/issues"
   },
-  "homepage": "https://github.com/your-username/vibepay#readme"
+  "homepage": "https://github.com/your-username/vpio#readme"
 }

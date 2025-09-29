@@ -4,7 +4,19 @@
       "Bash(mkdir:*)",
       "Bash(git remote remove:*)",
       "Bash(echo $CODESPACES)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm install)",
+      "Bash(npm ci:*)",
+      "Bash(npm start)",
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(xargs sed:*)",
+      "Bash(npm install:*)",
+      "Bash(PORT=3003 node api/index.js)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibePay Admin Dashboard</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Configure Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        linear: {
+                            purple: '#5e6ad2',
+                            gray: {
+                                50: '#fafbfc',
+                                100: '#f4f6f8',
+                                200: '#e8ecf0',
+                                300: '#d9dee4',
+                                400: '#b8c2cc',
+                                500: '#8590a2',
+                                600: '#677489',
+                                700: '#525b70',
+                                800: '#404754',
+                                900: '#2d3142'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom styles for Linear.app aesthetic -->
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-feature-settings: 'cv01', 'cv03', 'cv04', 'cv11';
+        }
+
+        .linear-card {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-card {
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-linear-gray-50 to-linear-gray-100 min-h-screen font-inter">
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-semibold text-linear-gray-900 mb-2">VibePay Admin</h2>
+                <p class="text-linear-gray-600">Enter admin password to continue</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <input
+                        type="password"
+                        id="adminPassword"
+                        placeholder="Admin password"
+                        class="w-full px-4 py-3 border border-linear-gray-200 rounded-lg focus:ring-2 focus:ring-linear-purple focus:border-transparent outline-none transition-colors"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button
+                    onclick="authenticate()"
+                    class="w-full bg-linear-purple text-white py-3 px-4 rounded-lg font-medium hover:bg-opacity-90 transition-colors focus:ring-2 focus:ring-linear-purple focus:ring-offset-2 outline-none"
+                >
+                    Access Dashboard
+                </button>
+
+                <div id="authError" class="text-red-500 text-sm text-center hidden"></div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <p class="text-xs text-linear-gray-500">
+                    Default password: <code class="bg-linear-gray-100 px-2 py-1 rounded">admin123</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-linear-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-xl font-semibold text-linear-gray-900">VibePay Admin</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="status-dot bg-green-500"></div>
+                        <span class="text-sm text-linear-gray-600">API Online</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-linear-gray-500">
+                        Last updated: <span id="lastUpdated">--:--</span>
+                    </div>
+                    <button
+                        onclick="logout()"
+                        class="text-sm text-linear-gray-600 hover:text-linear-gray-900 transition-colors"
+                    >
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 max-w-7xl mx-auto">
+
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Payments Today -->
+                <div class="metric-card bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-linear-gray-600">Payments Today</h3>
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-semibold text-linear-gray-900" id="totalPayments">
+                        <div class="loading-shimmer w-16 h-6 rounded"></div>
+                    </div>
+                    <div class="text-sm text-linear-gray-500 mt-1" id="paymentsChange">--</div>
+                </div>
+
+                <!-- Revenue Today -->
+                <div class="metric-card bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-linear-gray-600">Revenue Today</h3>
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-semibold text-linear-gray-900" id="totalRevenue">
+                        <div class="loading-shimmer w-20 h-6 rounded"></div>
+                    </div>
+                    <div class="text-sm text-linear-gray-500 mt-1" id="revenueChange">--</div>
+                </div>
+
+                <!-- Fees Collected -->
+                <div class="metric-card bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-linear-gray-600">Fees Collected</h3>
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-semibold text-linear-gray-900" id="totalFees">
+                        <div class="loading-shimmer w-16 h-6 rounded"></div>
+                    </div>
+                    <div class="text-sm text-linear-gray-500 mt-1" id="feesChange">0.5% of revenue</div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="metric-card bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-linear-gray-600">Success Rate</h3>
+                        <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-semibold text-linear-gray-900" id="successRate">
+                        <div class="loading-shimmer w-12 h-6 rounded"></div>
+                    </div>
+                    <div class="text-sm text-linear-gray-500 mt-1" id="successRateChange">--</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Payment Volume Chart -->
+                <div class="bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <h3 class="text-lg font-semibold text-linear-gray-900 mb-4">Daily Payment Volume</h3>
+                    <div class="relative h-64">
+                        <canvas id="paymentVolumeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Processor Distribution -->
+                <div class="bg-white rounded-xl p-6 border border-linear-gray-200">
+                    <h3 class="text-lg font-semibold text-linear-gray-900 mb-4">Payment Processors</h3>
+                    <div class="relative h-64">
+                        <canvas id="processorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="bg-white rounded-xl border border-linear-gray-200">
+                <div class="px-6 py-4 border-b border-linear-gray-200">
+                    <h3 class="text-lg font-semibold text-linear-gray-900">Recent Transactions</h3>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-sm text-linear-gray-600">
+                                    <th class="pb-3 font-medium">Transaction ID</th>
+                                    <th class="pb-3 font-medium">Amount</th>
+                                    <th class="pb-3 font-medium">Processor</th>
+                                    <th class="pb-3 font-medium">Status</th>
+                                    <th class="pb-3 font-medium">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <!-- Loading placeholders -->
+                                <tr class="border-t border-linear-gray-100">
+                                    <td class="py-3"><div class="loading-shimmer w-24 h-4 rounded"></div></td>
+                                    <td class="py-3"><div class="loading-shimmer w-16 h-4 rounded"></div></td>
+                                    <td class="py-3"><div class="loading-shimmer w-20 h-4 rounded"></div></td>
+                                    <td class="py-3"><div class="loading-shimmer w-16 h-4 rounded"></div></td>
+                                    <td class="py-3"><div class="loading-shimmer w-20 h-4 rounded"></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            apiUrl: 'http://localhost:3000',
+            apiKey: 'vibe-test-key-1',
+            adminPassword: 'admin123',
+            refreshInterval: 30000 // 30 seconds
+        };
+
+        // Global variables
+        let refreshTimer;
+        let paymentVolumeChart;
+        let processorChart;
+
+        // Authentication
+        function authenticate() {
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('authError');
+
+            if (password === CONFIG.adminPassword) {
+                document.getElementById('authModal').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                startDashboard();
+            } else {
+                errorDiv.textContent = 'Invalid password';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function logout() {
+            document.getElementById('authModal').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('authError').classList.add('hidden');
+            stopRefresh();
+        }
+
+        // Dashboard initialization
+        function startDashboard() {
+            loadData();
+            initCharts();
+            startAutoRefresh();
+        }
+
+        // Data loading
+        async function loadData() {
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}/api/stats`, {
+                    headers: {
+                        'x-api-key': CONFIG.apiKey
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch stats');
+
+                const data = await response.json();
+                updateMetrics(data);
+                updateCharts(data);
+                updateTransactions(data);
+                updateLastUpdated();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        // Update metrics
+        function updateMetrics(data) {
+            const today = data.today || {};
+
+            document.getElementById('totalPayments').textContent = today.totalTransactions || 0;
+            document.getElementById('totalRevenue').textContent = `$${(today.totalAmount || 0).toFixed(2)}`;
+            document.getElementById('totalFees').textContent = `$${(today.totalFees || 0).toFixed(2)}`;
+
+            const successRate = today.totalTransactions > 0
+                ? Math.round((today.successfulPayments / today.totalTransactions) * 100)
+                : 100;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Payment Volume Chart
+            const volumeCtx = document.getElementById('paymentVolumeChart').getContext('2d');
+            paymentVolumeChart = new Chart(volumeCtx, {
+                type: 'line',
+                data: {
+                    labels: getLast7Days(),
+                    datasets: [{
+                        label: 'Payment Volume',
+                        data: generateMockVolumeData(),
+                        borderColor: '#5e6ad2',
+                        backgroundColor: 'rgba(94, 106, 210, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b' }
+                        }
+                    }
+                }
+            });
+
+            // Processor Distribution Chart
+            const processorCtx = document.getElementById('processorChart').getContext('2d');
+            processorChart = new Chart(processorCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Stripe', 'Square', 'PayPal', 'Plaid'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#5e6ad2', '#06b6d4', '#eab308', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts
+        function updateCharts(data) {
+            // Update with real data when available
+            // For now using mock data for demonstration
+        }
+
+        // Update transactions table
+        function updateTransactions(data) {
+            const tbody = document.getElementById('transactionsTable');
+            tbody.innerHTML = generateMockTransactions();
+        }
+
+        // Utility functions
+        function getLast7Days() {
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return days;
+        }
+
+        function generateMockVolumeData() {
+            return [12, 19, 8, 15, 22, 18, 25];
+        }
+
+        function generateMockTransactions() {
+            const transactions = [
+                { id: 'pi_1234567890', amount: 99.99, processor: 'Stripe', status: 'completed', time: '2 min ago' },
+                { id: 'pi_0987654321', amount: 49.50, processor: 'Square', status: 'completed', time: '5 min ago' },
+                { id: 'pi_1122334455', amount: 199.00, processor: 'PayPal', status: 'pending', time: '8 min ago' },
+                { id: 'pi_5566778899', amount: 25.99, processor: 'Stripe', status: 'completed', time: '12 min ago' },
+                { id: 'pi_9988776655', amount: 75.00, processor: 'Plaid', status: 'failed', time: '15 min ago' }
+            ];
+
+            return transactions.map(tx => `
+                <tr class="border-t border-linear-gray-100">
+                    <td class="py-3 text-sm text-linear-gray-900 font-mono">${tx.id}</td>
+                    <td class="py-3 text-sm text-linear-gray-900 font-medium">$${tx.amount}</td>
+                    <td class="py-3 text-sm text-linear-gray-600">${tx.processor}</td>
+                    <td class="py-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass(tx.status)}">
+                            ${tx.status}
+                        </span>
+                    </td>
+                    <td class="py-3 text-sm text-linear-gray-500">${tx.time}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'completed': return 'bg-green-100 text-green-800';
+                case 'pending': return 'bg-yellow-100 text-yellow-800';
+                case 'failed': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleTimeString('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showError(message) {
+            // Simple error handling - could be enhanced with toast notifications
+            console.error(message);
+        }
+
+        // Auto-refresh
+        function startAutoRefresh() {
+            refreshTimer = setInterval(loadData, CONFIG.refreshInterval);
+        }
+
+        function stopRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                authenticate();
+            }
+        });
+
+        // Initialize
+        document.getElementById('adminPassword').focus();
+    </script>
+</body>
+</html>
