@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibePay One-Line Integrations - Dead Simple</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .example-section {
+            background: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            float: right;
+        }
+        h1 { text-align: center; color: #333; }
+        h2 { color: #667eea; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .demo-area {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .one-liner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 VibePay One-Line Integrations</h1>
+    <p style="text-align: center; color: #666; font-size: 18px;">
+        Dead simple payment integration for Vibe coders. Copy, paste, done.
+    </p>
+
+    <!-- Method 1: Data Attributes -->
+    <div class="example-section">
+        <h2>Method 1: <span class="one-liner">Zero JavaScript</span> - HTML Data Attributes</h2>
+        <p>Just add data attributes to any button. VibePay SDK auto-detects and converts it.</p>
+
+        <div class="code-block">
+            &lt;!-- Step 1: Include SDK --&gt;<br>
+            &lt;script src="vibepay-sdk.js"&gt;&lt;/script&gt;<br><br>
+            &lt;!-- Step 2: Add data-vibepay to any button --&gt;<br>
+            &lt;button <strong>data-vibepay="10"</strong> data-description="Premium Plan"&gt;Subscribe&lt;/button&gt;
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="demo-area">
+            <button id="data-btn" data-vibepay="10" data-description="Premium Plan">Subscribe for $10</button>
+            <p><em>👆 This button was auto-converted by VibePay SDK</em></p>
+        </div>
+    </div>
+
+    <!-- Method 2: CSS Class -->
+    <div class="example-section">
+        <h2>Method 2: <span class="one-liner">CSS Class</span> - Add .vibepay-button</h2>
+        <p>Add the CSS class and data-amount. VibePay handles the rest.</p>
+
+        <div class="code-block">
+            &lt;button <strong>class="vibepay-button"</strong> data-amount="25" data-description="Pro Plan"&gt;
+                Get Pro Plan
+            &lt;/button&gt;
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="demo-area">
+            <button id="class-btn" class="vibepay-button" data-amount="25" data-description="Pro Plan">Get Pro Plan</button>
+            <p><em>👆 Auto-styled and functional via CSS class</em></p>
+        </div>
+    </div>
+
+    <!-- Method 3: JavaScript One-Liner -->
+    <div class="example-section">
+        <h2>Method 3: <span class="one-liner">JavaScript One-Liner</span> - VibePay.payButton()</h2>
+        <p>One line of JavaScript to convert any element into a payment button.</p>
+
+        <div class="code-block">
+            // Turn any button into a payment button<br>
+            <strong>VibePay.payButton('#my-btn', 50, 'Donation');</strong>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="demo-area">
+            <button id="js-btn">Donate</button>
+            <button onclick="VibePay.payButton('#js-btn', 50, 'Donation')" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                ⚡ Convert to Payment Button
+            </button>
+            <p><em>👆 Click "Convert" to see the magic</em></p>
+        </div>
+    </div>
+
+    <!-- Method 4: Auto-Inject -->
+    <div class="example-section">
+        <h2>Method 4: <span class="one-liner">Auto-Inject</span> - VibePay.injectButton()</h2>
+        <p>Automatically inject a payment button into any container.</p>
+
+        <div class="code-block">
+            // Inject a payment button anywhere<br>
+            <strong>VibePay.injectButton('#container', 100, 'Enterprise Plan');</strong>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="demo-area">
+            <div id="inject-demo" style="border: 1px dashed #ccc; padding: 10px; min-height: 50px;">
+                <p>Empty container - button will be injected here:</p>
+            </div>
+            <button onclick="VibePay.injectButton('#inject-demo', 100, 'Enterprise Plan')" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                💉 Inject Payment Button
+            </button>
+        </div>
+    </div>
+
+    <!-- Method 5: Programmatic -->
+    <div class="example-section">
+        <h2>Method 5: <span class="one-liner">Programmatic</span> - VibePay.quickPay()</h2>
+        <p>Trigger payments from anywhere in your code with one function call.</p>
+
+        <div class="code-block">
+            // Trigger payment from anywhere<br>
+            <strong>VibePay.quickPay(75, 'Custom Item').then(result => console.log(result));</strong>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <div class="demo-area">
+            <button onclick="VibePay.quickPay(75, 'Custom Item').then(result => console.log(result))"
+                    style="background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer;">
+                🔥 Quick Pay $75
+            </button>
+            <p><em>👆 Direct payment trigger (check console for result)</em></p>
+        </div>
+    </div>
+
+    <!-- Copy-Paste Templates -->
+    <div class="example-section">
+        <h2>📋 Copy-Paste Templates for Vibe Coders</h2>
+
+        <h3>Minimal Setup (2 lines):</h3>
+        <div class="code-block">
+&lt;script src="https://your-cdn.com/vibepay-sdk.js"&gt;&lt;/script&gt;<br>
+&lt;button data-vibepay="10"&gt;Pay $10&lt;/button&gt;
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>React Component:</h3>
+        <div class="code-block">
+useEffect(() => VibePay.payButton('#react-btn', 25), []);<br>
+return &lt;button id="react-btn"&gt;Subscribe&lt;/button&gt;;
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Vue.js Template:</h3>
+        <div class="code-block">
+&lt;button ref="payBtn" @click="() => VibePay.quickPay(30)"&gt;Pay Now&lt;/button&gt;
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+
+        <h3>Configuration (one time setup):</h3>
+        <div class="code-block">
+VibePay.configure({<br>
+&nbsp;&nbsp;apiUrl: 'https://your-api.com',<br>
+&nbsp;&nbsp;apiKey: 'your-api-key',<br>
+&nbsp;&nbsp;stripeKey: 'pk_live_...'<br>
+});
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="example-section">
+        <h2>✨ Why Vibe Coders Love This</h2>
+        <ul style="font-size: 16px; line-height: 1.6;">
+            <li><strong>🚀 Zero Learning Curve:</strong> Copy, paste, works immediately</li>
+            <li><strong>📱 Works Everywhere:</strong> HTML, React, Vue, vanilla JS, any framework</li>
+            <li><strong>🎨 Auto-Styled:</strong> Beautiful buttons with zero CSS required</li>
+            <li><strong>⚡ Lightning Fast:</strong> No build tools, no npm installs, just works</li>
+            <li><strong>🔧 Smart Defaults:</strong> Everything pre-configured for Vibe platform</li>
+            <li><strong>💝 Error Handling:</strong> Built-in error messages and loading states</li>
+        </ul>
+    </div>
+
+    <!-- Include VibePay SDK -->
+    <script src="vibepay-sdk.js"></script>
+
+    <script>
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const text = codeBlock.textContent.replace('Copy', '').trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#28a745';
+                }, 1000);
+            });
+        }
+
+        // Configure VibePay for this demo
+        VibePay.configure({
+            apiUrl: 'http://localhost:3000',
+            apiKey: 'vibe-test-key-1'
+        });
+
+        console.log('🎉 VibePay SDK loaded! Try the examples above.');
+        console.log('💡 Tip: Check the Network tab to see API calls in action.');
+    </script>
+</body>
+</html>

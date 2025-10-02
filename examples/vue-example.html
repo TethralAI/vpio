@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibePay Vue.js Integration Example</title>
+
+    <!-- Vue.js CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f7f9fc;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .pay-button {
+            background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .api-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f1f3f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .vue-logo {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="vue-app"></div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        // VibePay Vue.js Integration Component
+        // This example shows how to integrate VibePay payments into a Vue.js application
+
+        const VibePay = {
+            setup() {
+                // Configuration - Update these for your environment
+                const config = {
+                    // VibePay API endpoint - change to your production URL
+                    apiUrl: 'http://localhost:3000',
+
+                    // Your VibePay API key - get this from your VibePay dashboard
+                    apiKey: 'vibe-test-key-1',
+
+                    // Your Stripe publishable key - get this from your Stripe dashboard
+                    stripePublishableKey: 'pk_test_51...' // Replace with your actual Stripe publishable key
+                };
+
+                // Reactive state
+                const loading = ref(false);
+                const status = ref(null);
+                const stripe = ref(null);
+
+                // Initialize Stripe when component mounts
+                onMounted(() => {
+                    // In production, replace with your actual Stripe publishable key
+                    if (window.Stripe && config.stripePublishableKey.startsWith('pk_')) {
+                        stripe.value = window.Stripe(config.stripePublishableKey);
+                    } else {
+                        status.value = {
+                            type: 'error',
+                            message: 'Please configure your Stripe publishable key in config.stripePublishableKey'
+                        };
+                    }
+                });
+
+                // Handle payment processing
+                const handlePayment = async () => {
+                    if (!stripe.value) {
+                        status.value = {
+                            type: 'error',
+                            message: 'Stripe not initialized. Please check your configuration.'
+                        };
+                        return;
+                    }
+
+                    loading.value = true;
+                    status.value = { type: 'loading', message: 'Creating payment intent...' };
+
+                    try {
+                        // Step 1: Create payment intent through VibePay API
+                        const response = await fetch(`${config.apiUrl}/api/payments/create`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-api-key': config.apiKey
+                            },
+                            body: JSON.stringify({
+                                amount: 10, // $10.00
+                                currency: 'usd',
+                                metadata: {
+                                    source: 'vue-example',
+                                    platform: 'vibe'
+                                }
+                            })
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Payment creation failed');
+                        }
+
+                        const paymentData = await response.json();
+
+                        status.value = { type: 'loading', message: 'Processing payment with Stripe...' };
+
+                        // Step 2: Confirm payment with Stripe
+                        // In a real application, you would use Stripe Elements for card collection
+                        // For this demo, we'll simulate the payment confirmation
+
+                        // Simulate payment processing delay
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        // Step 3: Handle successful payment
+                        status.value = {
+                            type: 'success',
+                            message: `✅ Payment successful! Payment ID: ${paymentData.id}. Total charged: $${paymentData.amount.toFixed(2)} (includes 0.5% VibePay fee)`
+                        };
+
+                        // In a real app, you would verify the payment status
+                        console.log('Payment Intent created:', paymentData);
+
+                    } catch (error) {
+                        console.error('Payment error:', error);
+                        status.value = {
+                            type: 'error',
+                            message: `❌ Payment failed: ${error.message}`
+                        };
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                // Return reactive properties and methods for template
+                return {
+                    loading,
+                    status,
+                    stripe,
+                    handlePayment,
+                    config
+                };
+            },
+
+            template: `
+                <div class="container">
+                    <h1><span class="vue-logo">Vue.js</span> VibePay Integration</h1>
+
+                    <p style="text-align: center; margin-bottom: 30px; color: #666;">
+                        This example demonstrates how to integrate VibePay into a Vue.js application.
+                        Click the button below to process a $10 payment with Stripe.
+                    </p>
+
+                    <!-- Pay Button -->
+                    <button
+                        class="pay-button"
+                        @click="handlePayment"
+                        :disabled="loading || !stripe"
+                    >
+                        {{ loading ? 'Processing...' : 'Pay $10' }}
+                    </button>
+
+                    <!-- Status Messages -->
+                    <div v-if="status" :class="'status-message ' + status.type">
+                        {{ status.message }}
+                    </div>
+
+                    <!-- Integration Information -->
+                    <div class="api-info">
+                        <h3>🔧 Integration Notes for Vibe Platform Developers:</h3>
+                        <ul>
+                            <li><strong>API Endpoint:</strong> <code>{{ config.apiUrl }}/api/payments/create</code></li>
+                            <li><strong>Authentication:</strong> Include <code>x-api-key</code> header with your VibePay API key</li>
+                            <li><strong>Amount:</strong> Specified in dollars (e.g., 10 = $10.00)</li>
+                            <li><strong>Fee:</strong> VibePay automatically adds 0.5% processing fee</li>
+                            <li><strong>Response:</strong> Contains <code>clientSecret</code> for Stripe confirmation</li>
+                            <li><strong>Vue.js Integration:</strong> Use reactive state with <code>ref()</code> and composition API</li>
+                        </ul>
+
+                        <h4>📋 Required Configuration:</h4>
+                        <ul>
+                            <li>Update <code>config.apiUrl</code> to your VibePay API endpoint</li>
+                            <li>Set <code>config.apiKey</code> to your VibePay API key</li>
+                            <li>Configure <code>config.stripePublishableKey</code> with your Stripe publishable key</li>
+                        </ul>
+
+                        <h4>🎯 Vue.js Specific Features:</h4>
+                        <ul>
+                            <li><strong>Composition API:</strong> Uses <code>setup()</code> function with reactive references</li>
+                            <li><strong>Lifecycle Hooks:</strong> <code>onMounted()</code> for Stripe initialization</li>
+                            <li><strong>Reactive State:</strong> <code>ref()</code> for loading, status, and stripe instances</li>
+                            <li><strong>Template Binding:</strong> <code>v-if</code>, <code>:disabled</code>, and <code>@click</code> directives</li>
+                        </ul>
+                    </div>
+                </div>
+            `
+        };
+
+        // Create and mount the Vue application
+        createApp(VibePay).mount('#vue-app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "env": {
+    "NEXT_PUBLIC_VPIO_API_URL": "@vpio-api-url",
+    "NEXT_PUBLIC_VPIO_API_KEY": "@vpio-api-key"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_VPIO_API_URL": "@vpio-api-url",
+      "NEXT_PUBLIC_VPIO_API_KEY": "@vpio-api-key"
+    }
+  }
+}

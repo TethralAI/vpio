@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibePay React Integration Example</title>
+
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f7f9fc;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .pay-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .api-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f1f3f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="react-app"></div>
+
+    <script type="text/babel">
+        // VibePay React Integration Component
+        // This example shows how to integrate VibePay payments into a React application
+
+        const { useState, useEffect } = React;
+
+        // Configuration - Update these for your environment
+        const CONFIG = {
+            // VibePay API endpoint - change to your production URL
+            apiUrl: 'http://localhost:3000',
+
+            // Your VibePay API key - get this from your VibePay dashboard
+            apiKey: 'vibe-test-key-1',
+
+            // Your Stripe publishable key - get this from your Stripe dashboard
+            stripePublishableKey: 'pk_test_51...' // Replace with your actual Stripe publishable key
+        };
+
+        function VibePay() {
+            // Component state
+            const [loading, setLoading] = useState(false);
+            const [status, setStatus] = useState(null);
+            const [stripe, setStripe] = useState(null);
+
+            // Initialize Stripe on component mount
+            useEffect(() => {
+                // In production, replace with your actual Stripe publishable key
+                if (window.Stripe && CONFIG.stripePublishableKey.startsWith('pk_')) {
+                    setStripe(window.Stripe(CONFIG.stripePublishableKey));
+                } else {
+                    setStatus({
+                        type: 'error',
+                        message: 'Please configure your Stripe publishable key in CONFIG.stripePublishableKey'
+                    });
+                }
+            }, []);
+
+            // Handle payment button click
+            const handlePayment = async () => {
+                if (!stripe) {
+                    setStatus({
+                        type: 'error',
+                        message: 'Stripe not initialized. Please check your configuration.'
+                    });
+                    return;
+                }
+
+                setLoading(true);
+                setStatus({ type: 'loading', message: 'Creating payment intent...' });
+
+                try {
+                    // Step 1: Create payment intent through VibePay API
+                    const response = await fetch(`${CONFIG.apiUrl}/api/payments/create`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': CONFIG.apiKey
+                        },
+                        body: JSON.stringify({
+                            amount: 10, // $10.00
+                            currency: 'usd',
+                            metadata: {
+                                source: 'react-example',
+                                platform: 'vibe'
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Payment creation failed');
+                    }
+
+                    const paymentData = await response.json();
+
+                    setStatus({ type: 'loading', message: 'Redirecting to Stripe checkout...' });
+
+                    // Step 2: Redirect to Stripe Checkout or use Elements
+                    // For this example, we'll use the client secret with Stripe Elements
+                    // In a real app, you might redirect to a checkout page
+
+                    const { error } = await stripe.confirmCardPayment(paymentData.clientSecret, {
+                        payment_method: {
+                            card: {
+                                // This would normally be your card element
+                                // For demo purposes, we'll show success
+                            }
+                        }
+                    });
+
+                    if (error) {
+                        throw new Error(error.message);
+                    }
+
+                    // Step 3: Handle successful payment
+                    setStatus({
+                        type: 'success',
+                        message: `Payment successful! Payment ID: ${paymentData.id}. Total charged: $${paymentData.amount} (includes 0.5% VibePay fee)`
+                    });
+
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    setStatus({
+                        type: 'error',
+                        message: `Payment failed: ${error.message}`
+                    });
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="container">
+                    <h1>VibePay React Integration</h1>
+
+                    <p style={{ textAlign: 'center', marginBottom: '30px', color: '#666' }}>
+                        This example demonstrates how to integrate VibePay into a React application.
+                        Click the button below to process a $10 payment with Stripe.
+                    </p>
+
+                    {/* Pay Button */}
+                    <button
+                        className="pay-button"
+                        onClick={handlePayment}
+                        disabled={loading || !stripe}
+                    >
+                        {loading ? 'Processing...' : 'Pay $10'}
+                    </button>
+
+                    {/* Status Messages */}
+                    {status && (
+                        <div className={`status-message ${status.type}`}>
+                            {status.message}
+                        </div>
+                    )}
+
+                    {/* Integration Information */}
+                    <div className="api-info">
+                        <h3>Integration Notes for Vibe Platform Developers:</h3>
+                        <ul>
+                            <li><strong>API Endpoint:</strong> <code>{CONFIG.apiUrl}/api/payments/create</code></li>
+                            <li><strong>Authentication:</strong> Include <code>x-api-key</code> header with your VibePay API key</li>
+                            <li><strong>Amount:</strong> Specified in dollars (e.g., 10 = $10.00)</li>
+                            <li><strong>Fee:</strong> VibePay automatically adds 0.5% processing fee</li>
+                            <li><strong>Response:</strong> Contains <code>clientSecret</code> for Stripe confirmation</li>
+                            <li><strong>Stripe Integration:</strong> Use <code>stripe.confirmCardPayment()</code> with the client secret</li>
+                        </ul>
+
+                        <h4>Required Configuration:</h4>
+                        <ul>
+                            <li>Update <code>CONFIG.apiUrl</code> to your VibePay API endpoint</li>
+                            <li>Set <code>CONFIG.apiKey</code> to your VibePay API key</li>
+                            <li>Configure <code>CONFIG.stripePublishableKey</code> with your Stripe publishable key</li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the React component
+        ReactDOM.render(<VibePay />, document.getElementById('react-app'));
+    </script>
+</body>
+</html>
